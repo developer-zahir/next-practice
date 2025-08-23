@@ -33,16 +33,13 @@ export default function ProductDetailPage() {
           if (relatedRes.ok) {
             const relatedData: Product[] = await relatedRes.json()
             const filteredRelated = relatedData
-              .filter((p) => p.id !== data.id)  // id ব্যবহার করা হয়েছে
+              .filter((p) => p._id.toString() !== data._id.toString()) // MongoDB ObjectId
               .slice(0, 4)
-              setRelatedProducts(filteredRelated)
-              console.log('Related products fetched:', filteredRelated);
-              
+            setRelatedProducts(filteredRelated)
           }
         }
       } catch (err) {
         console.error('Failed to fetch related product:', err)
-        
       } finally {
         setLoading(false)
       }
@@ -169,19 +166,6 @@ export default function ProductDetailPage() {
                 Buy Now
               </Button>
             </div>
-
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-4">Product Features</h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>• Premium quality materials</li>
-                  <li>• 30-day money-back guarantee</li>
-                  <li>• Free shipping on orders over $50</li>
-                  <li>• 24/7 customer support</li>
-                  <li>• Secure payment processing</li>
-                </ul>
-              </CardContent>
-            </Card>
           </div>
         </div>
 
@@ -190,7 +174,7 @@ export default function ProductDetailPage() {
             <h2 className="text-2xl font-bold mb-8 text-center">You might also like</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               {relatedProducts.map((p) => (
-                <Card key={p.id} className="group hover:shadow-lg transition-all duration-300">
+                <Card key={p._id.toString()} className="group hover:shadow-lg transition-all duration-300">
                   <CardContent className="p-4">
                     <div className="bg-muted rounded-lg h-32 mb-4">
                       <Image
