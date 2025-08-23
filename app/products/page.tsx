@@ -117,7 +117,7 @@ export default function ProductsPage() {
                         src={product.image}
                         alt={product.name}
                         width={400}
-                        height={300}
+                        height={400}
                         className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       {product.featured && <Badge className="absolute top-4 left-4">Featured</Badge>}

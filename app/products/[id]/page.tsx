@@ -8,7 +8,7 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Star, Heart, Share2, ShoppingCart } from "lucide-react";
@@ -36,13 +36,10 @@ export default function ProductDetailPage() {
         console.log("All related products:", relatedData);
 
         // filter out the current product
-        const filteredRelated = relatedData
-          .filter((p) => p._id.toString() !== data._id.toString())
-          .slice(0, 4);
+        const filteredRelated = relatedData.filter((p) => p._id.toString() !== data._id.toString()).slice(0, 4);
 
         setRelatedProducts(filteredRelated);
         console.log("Filtered related products:", filteredRelated);
-
       } catch (err) {
         console.error(err);
       } finally {
@@ -111,13 +108,7 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div className="space-y-4">
             <div className="relative overflow-hidden rounded-lg bg-muted">
-              <Image
-                src={product.image}
-                alt={product.name}
-                width={600}
-                height={600}
-                className="w-full h-96 lg:h-[500px] object-cover"
-              />
+              <Image src={product.image} alt={product.name} width={600} height={600} className="w-full h-96 lg:h-[500px] object-cover" />
               {product.featured && <Badge className="absolute top-4 left-4">Featured</Badge>}
             </div>
           </div>
@@ -128,10 +119,7 @@ export default function ProductDetailPage() {
                 <Badge variant="secondary">{product.category}</Badge>
                 <div className="flex items-center">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-4 w-4 ${i < 4 ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`}
-                    />
+                    <Star key={i} className={`h-4 w-4 ${i < 4 ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`} />
                   ))}
                   <span className="ml-2 text-sm text-muted-foreground">(4.8)</span>
                 </div>
@@ -186,23 +174,41 @@ export default function ProductDetailPage() {
         {relatedProducts.length > 0 && (
           <div className="mt-16">
             <h2 className="text-2xl font-bold mb-8 text-center">You might also like</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {relatedProducts.map((p) => (
-                <Card key={p._id.toString()} className="group hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-4">
-                    <div className="bg-muted rounded-lg h-32 mb-4">
+                <Card key={p._id} className="group hover:shadow-lg transition-all duration-300">
+                  <CardHeader className="p-0">
+                    <div className="relative overflow-hidden rounded-t-lg">
                       <Image
                         src={p.image}
                         alt={p.name}
-                        width={300}
-                        height={200}
-                        className="w-full h-full object-cover rounded-lg"
+                        width={400}
+                        height={400}
+                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                       />
+                      {p.featured && <Badge className="absolute top-4 left-4">Featured</Badge>}
+                      <div className="absolute top-4 right-4 flex items-center space-x-1 bg-background/80 backdrop-blur px-2 py-1 rounded">
+                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                        <span className="text-xs font-medium">4.8</span>
+                      </div>
                     </div>
-                    <h3 className="font-semibold mb-2">{p.name}</h3>
-                    <p className="text-muted-foreground text-sm mb-2">{p.description}</p>
-                    <span className="font-bold text-primary">${p.price}</span>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <CardTitle className="mb-2 group-hover:text-primary transition-colors">{p.name}</CardTitle>
+                    <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{p.description}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-primary">${p.price}</span>
+                      <Badge variant="secondary">{p.category}</Badge>
+                    </div>
                   </CardContent>
+                  <CardFooter className="p-6 pt-0">
+                    <Button asChild className="w-full group">
+                      <Link href={`/products/${p._id}`}>
+                        View Details
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </Link>
+                    </Button>
+                  </CardFooter>
                 </Card>
               ))}
             </div>
