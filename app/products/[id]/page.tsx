@@ -23,23 +23,23 @@ export default function ProductDetailPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`/api/products/${params.id}`)
-        if (response.ok) {
-          const data: Product = await response.json()
+        const res = await fetch(`/api/products/${params.id}`)
+        if (res.ok) {
+          const data: Product = await res.json()
           setProduct(data)
 
-          // Fetch related products (same category)
+          // fetch related products from same category
           const relatedRes = await fetch(`/api/products?category=${encodeURIComponent(data.category)}`)
           if (relatedRes.ok) {
             const relatedData: Product[] = await relatedRes.json()
             const filteredRelated = relatedData
-              .filter((p) => p._id !== data._id)
+              .filter((p) => p.id !== data.id)  // id ব্যবহার করা হয়েছে
               .slice(0, 4)
             setRelatedProducts(filteredRelated)
           }
         }
-      } catch (error) {
-        console.error('Failed to fetch product:', error)
+      } catch (err) {
+        console.error('Failed to fetch product:', err)
       } finally {
         setLoading(false)
       }
@@ -129,24 +129,18 @@ export default function ProductDetailPage() {
                   {Array.from({ length: 5 }).map((_, i) => (
                     <Star
                       key={i}
-                      className={`h-4 w-4 ${
-                        i < 4 ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'
-                      }`}
+                      className={`h-4 w-4 ${i < 4 ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
                     />
                   ))}
                   <span className="ml-2 text-sm text-muted-foreground">(4.8)</span>
                 </div>
               </div>
               <h1 className="text-3xl lg:text-4xl font-bold mb-4">{product.name}</h1>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                {product.description}
-              </p>
+              <p className="text-lg text-muted-foreground leading-relaxed">{product.description}</p>
             </div>
 
             <div className="flex items-center gap-4">
-              <span className="text-3xl font-bold text-primary">
-                ${product.price}
-              </span>
+              <span className="text-3xl font-bold text-primary">${product.price}</span>
               <Badge variant="outline" className="text-green-600 border-green-600">
                 In Stock
               </Badge>
@@ -188,25 +182,25 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* Related Products Section */}
         {relatedProducts.length > 0 && (
           <div className="mt-16">
-            <h2 className="text-2xl font-bold mb-8 text-center">Related Products</h2>
+            <h2 className="text-2xl font-bold mb-8 text-center">You might also like</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {relatedProducts.map((prod) => (
-                <Card key={prod._id} className="group hover:shadow-lg transition-all duration-300">
+              {relatedProducts.map((p) => (
+                <Card key={p.id} className="group hover:shadow-lg transition-all duration-300">
                   <CardContent className="p-4">
-                    <div className="relative w-full h-32 mb-4">
+                    <div className="bg-muted rounded-lg h-32 mb-4">
                       <Image
-                        src={prod.image}
-                        alt={prod.name}
-                        fill
-                        className="object-cover rounded-lg"
+                        src={p.image}
+                        alt={p.name}
+                        width={300}
+                        height={200}
+                        className="w-full h-full object-cover rounded-lg"
                       />
                     </div>
-                    <h3 className="font-semibold mb-2">{prod.name}</h3>
-                    <p className="text-muted-foreground text-sm mb-2 line-clamp-2">{prod.description}</p>
-                    <span className="font-bold text-primary">${prod.price}</span>
+                    <h3 className="font-semibold mb-2">{p.name}</h3>
+                    <p className="text-muted-foreground text-sm mb-2">{p.description}</p>
+                    <span className="font-bold text-primary">${p.price}</span>
                   </CardContent>
                 </Card>
               ))}
