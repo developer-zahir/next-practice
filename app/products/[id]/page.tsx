@@ -30,6 +30,10 @@ export default function ProductDetailPage() {
 
           // fetch related products from same category
           const relatedRes = await fetch(`/api/products?category=${encodeURIComponent(data.category)}`)
+
+          console.log('Fetching related products for category:', data.category );
+          console.log('Related products response status:', relatedRes);
+          
           if (relatedRes.ok) {
             const relatedData: Product[] = await relatedRes.json()
             const filteredRelated = relatedData
