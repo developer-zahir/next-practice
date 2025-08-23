@@ -1,26 +1,26 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 
-// GET - fetch all products
-export async function GET() {
+// GET - fetch all products or by category
+export async function GET(req: Request) {
   try {
-    const client = await clientPromise
-    const db = client.db("myDatabase")
+    const client = await clientPromise;
+    const db = client.db("myDatabase");
 
-    // Recent products আগে দেখানোর জন্য sort করা হচ্ছে
+    const url = new URL(req.url);
+    const category = url.searchParams.get("category"); // query থেকে category পাওয়া
+
+    const filter = category ? { category } : {}; // যদি category থাকে তাহলে filter
     const products = await db
       .collection("products")
-      .find({})
-      .sort({ _id: -1 })  // -1 মানে descending, নতুনগুলো আগে
-      .toArray()
+      .find(filter)
+      .sort({ _id: -1 }) // Recent products আগে দেখাবে
+      .toArray();
 
-    return NextResponse.json(products)
+    return NextResponse.json(products);
   } catch (error) {
-    console.error(error)
-    return NextResponse.json(
-      { error: "Failed to fetch products" },
-      { status: 500 }
-    )
+    console.error(error);
+    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
   }
 }
 
@@ -47,7 +47,6 @@ export async function POST(req: Request) {
       createdAt: new Date(),
     });
 
-    // fetch the inserted document to return
     const product = await db.collection("products").findOne({ _id: newProduct.insertedId });
 
     return NextResponse.json(product);
