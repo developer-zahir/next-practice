@@ -35,11 +35,14 @@ export default function ProductDetailPage() {
             const filteredRelated = relatedData
               .filter((p) => p.id !== data.id)  // id ব্যবহার করা হয়েছে
               .slice(0, 4)
-            setRelatedProducts(filteredRelated)
+              setRelatedProducts(filteredRelated)
+              console.log('Related products fetched:', filteredRelated);
+              
           }
         }
       } catch (err) {
-        console.error('Failed to fetch product:', err)
+        console.error('Failed to fetch related product:', err)
+        
       } finally {
         setLoading(false)
       }
