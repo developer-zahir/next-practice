@@ -4,14 +4,23 @@ import clientPromise from "@/lib/mongodb";
 // GET - fetch all products
 export async function GET() {
   try {
-    const client = await clientPromise;
-    const db = client.db("myDatabase");
-    const products = await db.collection("products").find({}).toArray();
+    const client = await clientPromise
+    const db = client.db("myDatabase")
 
-    return NextResponse.json(products);
+    // Recent products আগে দেখানোর জন্য sort করা হচ্ছে
+    const products = await db
+      .collection("products")
+      .find({})
+      .sort({ _id: -1 })  // -1 মানে descending, নতুনগুলো আগে
+      .toArray()
+
+    return NextResponse.json(products)
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
+    console.error(error)
+    return NextResponse.json(
+      { error: "Failed to fetch products" },
+      { status: 500 }
+    )
   }
 }
 
