@@ -1,57 +1,53 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
-import Link from 'next/link'
-import Image from 'next/image'
-import { Navbar } from '@/components/navbar'
-import { Footer } from '@/components/footer'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
-import { Skeleton } from '@/components/ui/skeleton'
-import { ArrowLeft, Star, Heart, Share2, ShoppingCart } from 'lucide-react'
-import type { Product } from '@/lib/products'
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowLeft, Star, Heart, Share2, ShoppingCart } from "lucide-react";
+import type { Product } from "@/lib/products";
 
 export default function ProductDetailPage() {
-  const params = useParams()
-  const [product, setProduct] = useState<Product | null>(null)
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
+  const params = useParams();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`/api/products/${params.id}`)
+        const res = await fetch(`/api/products/${params.id}`);
         if (res.ok) {
-          const data: Product = await res.json()
-          setProduct(data)
+          const data: Product = await res.json();
+          setProduct(data);
 
           // fetch related products from same category
-          const relatedRes = await fetch(`/api/products?category=${encodeURIComponent(data.category)}`)
+          const relatedRes = await fetch(`/api/products?category=${encodeURIComponent(data.category)}`);
           if (relatedRes.ok) {
-            const relatedData: Product[] = await relatedRes.json()
-            console.log('Related products fetched:', relatedData);
-            
-            const filteredRelated = relatedData
-              .filter((p) => p.id !== data.id)  // id ব্যবহার করা হয়েছে
-              .slice(0, 4)
-              setRelatedProducts(filteredRelated)
-              console.log('Related products fetched:', filteredRelated);
-              
+            const relatedData: Product[] = await relatedRes.json();
+            console.log("Related products fetched:", relatedData);
+
+            const filteredRelated = relatedData.filter((p) => p._id.toString() !== product?._id.toString()).slice(0, 4);
+            setRelatedProducts(filteredRelated);
+            console.log("Related products fetched:", filteredRelated);
           }
         }
       } catch (err) {
-        console.error('Failed to fetch related product:', err)
-        
+        console.error("Failed to fetch related product:", err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchProduct()
-  }, [params.id])
+    fetchProduct();
+  }, [product?._id , params.id]);
 
   if (loading) {
     return (
@@ -71,7 +67,7 @@ export default function ProductDetailPage() {
         </main>
         <Footer />
       </div>
-    )
+    );
   }
 
   if (!product) {
@@ -81,9 +77,7 @@ export default function ProductDetailPage() {
         <main className="container mx-auto px-4 py-12">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
-            <p className="text-muted-foreground mb-8">
-              The product you're looking for doesn't exist.
-            </p>
+            <p className="text-muted-foreground mb-8">The product you're looking for doesn't exist.</p>
             <Button asChild>
               <Link href="/products">
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -94,7 +88,7 @@ export default function ProductDetailPage() {
         </main>
         <Footer />
       </div>
-    )
+    );
   }
 
   return (
@@ -113,16 +107,8 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div className="space-y-4">
             <div className="relative overflow-hidden rounded-lg bg-muted">
-              <Image
-                src={product.image}
-                alt={product.name}
-                width={600}
-                height={600}
-                className="w-full h-96 lg:h-[500px] object-cover"
-              />
-              {product.featured && (
-                <Badge className="absolute top-4 left-4">Featured</Badge>
-              )}
+              <Image src={product.image} alt={product.name} width={600} height={600} className="w-full h-96 lg:h-[500px] object-cover" />
+              {product.featured && <Badge className="absolute top-4 left-4">Featured</Badge>}
             </div>
           </div>
 
@@ -132,10 +118,7 @@ export default function ProductDetailPage() {
                 <Badge variant="secondary">{product.category}</Badge>
                 <div className="flex items-center">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-4 w-4 ${i < 4 ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground'}`}
-                    />
+                    <Star key={i} className={`h-4 w-4 ${i < 4 ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`} />
                   ))}
                   <span className="ml-2 text-sm text-muted-foreground">(4.8)</span>
                 </div>
@@ -166,7 +149,7 @@ export default function ProductDetailPage() {
                   <Share2 className="h-5 w-5" />
                 </Button>
               </div>
-              
+
               <Button variant="outline" className="w-full" size="lg">
                 Buy Now
               </Button>
@@ -195,13 +178,7 @@ export default function ProductDetailPage() {
                 <Card key={p.id} className="group hover:shadow-lg transition-all duration-300">
                   <CardContent className="p-4">
                     <div className="bg-muted rounded-lg h-32 mb-4">
-                      <Image
-                        src={p.image}
-                        alt={p.name}
-                        width={300}
-                        height={200}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
+                      <Image src={p.image} alt={p.name} width={300} height={200} className="w-full h-full object-cover rounded-lg" />
                     </div>
                     <h3 className="font-semibold mb-2">{p.name}</h3>
                     <p className="text-muted-foreground text-sm mb-2">{p.description}</p>
@@ -215,5 +192,5 @@ export default function ProductDetailPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }
