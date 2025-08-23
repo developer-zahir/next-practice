@@ -23,31 +23,35 @@ export default function ProductDetailPage() {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        // fetch single product
         const res = await fetch(`/api/products/${params.id}`);
-        if (res.ok) {
-          const data: Product = await res.json();
-          setProduct(data);
+        if (!res.ok) throw new Error("Failed to fetch product");
+        const data: Product = await res.json();
+        setProduct(data);
 
-          // fetch related products from same category
-          const relatedRes = await fetch(`/api/products?category=${encodeURIComponent(data.category)}`);
-          if (relatedRes.ok) {
-            const relatedData: Product[] = await relatedRes.json();
-            console.log("all Related products fetched:", relatedData);
+        // fetch related products using the fetched product data
+        const relatedRes = await fetch(`/api/products?category=${encodeURIComponent(data.category)}`);
+        if (!relatedRes.ok) throw new Error("Failed to fetch related products");
+        const relatedData: Product[] = await relatedRes.json();
+        console.log("All related products:", relatedData);
 
-            const filteredRelated = relatedData.filter((p) => p._id.toString() !== product?._id.toString()).slice(0, 4);
-            setRelatedProducts(filteredRelated);
-            console.log("filterd Related products fetched:", setRelatedProducts);
-          }
-        }
+        // filter out the current product
+        const filteredRelated = relatedData
+          .filter((p) => p._id.toString() !== data._id.toString())
+          .slice(0, 4);
+
+        setRelatedProducts(filteredRelated);
+        console.log("Filtered related products:", filteredRelated);
+
       } catch (err) {
-        console.error("Failed to fetch related product:", err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchProduct();
-  }, [product?._id , params.id]);
+  }, [params.id]);
 
   if (loading) {
     return (
@@ -107,7 +111,13 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div className="space-y-4">
             <div className="relative overflow-hidden rounded-lg bg-muted">
-              <Image src={product.image} alt={product.name} width={600} height={600} className="w-full h-96 lg:h-[500px] object-cover" />
+              <Image
+                src={product.image}
+                alt={product.name}
+                width={600}
+                height={600}
+                className="w-full h-96 lg:h-[500px] object-cover"
+              />
               {product.featured && <Badge className="absolute top-4 left-4">Featured</Badge>}
             </div>
           </div>
@@ -118,7 +128,10 @@ export default function ProductDetailPage() {
                 <Badge variant="secondary">{product.category}</Badge>
                 <div className="flex items-center">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className={`h-4 w-4 ${i < 4 ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`} />
+                    <Star
+                      key={i}
+                      className={`h-4 w-4 ${i < 4 ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`}
+                    />
                   ))}
                   <span className="ml-2 text-sm text-muted-foreground">(4.8)</span>
                 </div>
@@ -175,10 +188,16 @@ export default function ProductDetailPage() {
             <h2 className="text-2xl font-bold mb-8 text-center">You might also like</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               {relatedProducts.map((p) => (
-                <Card key={p.id} className="group hover:shadow-lg transition-all duration-300">
+                <Card key={p._id.toString()} className="group hover:shadow-lg transition-all duration-300">
                   <CardContent className="p-4">
                     <div className="bg-muted rounded-lg h-32 mb-4">
-                      <Image src={p.image} alt={p.name} width={300} height={200} className="w-full h-full object-cover rounded-lg" />
+                      <Image
+                        src={p.image}
+                        alt={p.name}
+                        width={300}
+                        height={200}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
                     </div>
                     <h3 className="font-semibold mb-2">{p.name}</h3>
                     <p className="text-muted-foreground text-sm mb-2">{p.description}</p>
