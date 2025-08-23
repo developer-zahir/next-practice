@@ -83,6 +83,8 @@ export default function AddProductPage() {
         const errorData = await response.json()
         setError(errorData.error || 'Failed to add product')
         toast.error('Failed to add product')
+        console.log('Error adding product:', errorData.error || 'Unknown error');
+        
       }
     } catch (error) {
       setError('An error occurred. Please try again.')
