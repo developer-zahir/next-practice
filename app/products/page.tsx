@@ -26,6 +26,7 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const [visibleCount, setVisibleCount] = useState(6) // প্রথমে 6 প্রোডাক্ট দেখাবো
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -49,6 +50,12 @@ export default function ProductsPage() {
       product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.category.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const visibleProducts = filteredProducts.slice(0, visibleCount)
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 6) // আরও 6 প্রোডাক্ট দেখাবে
+  }
 
   return (
     <div className="min-h-screen">
@@ -109,7 +116,7 @@ export default function ProductsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProducts.map((product) => (
+              {visibleProducts.map((product) => (
                 <Card key={product._id} className="group hover:shadow-lg transition-all duration-300">
                   <CardHeader className="p-0">
                     <div className="relative overflow-hidden rounded-t-lg">
@@ -148,6 +155,12 @@ export default function ProductsPage() {
                 </Card>
               ))}
             </div>
+
+            {visibleCount < filteredProducts.length && (
+              <div className="text-center mt-8">
+                <Button onClick={handleLoadMore}>Load More</Button>
+              </div>
+            )}
 
             {filteredProducts.length === 0 && !loading && (
               <div className="text-center py-12">
