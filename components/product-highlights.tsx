@@ -23,8 +23,10 @@ export async function ProductHighlights() {
   const featuredProductsFromDb = await db
     .collection<Product>('products')
     .find({ featured: true })
-    .limit(6)
+    .limit(3)
+    .sort({ _id: -1 })
     .toArray()
+    
 
   // Convert ObjectId to string
   const featuredProducts = featuredProductsFromDb.map(p => ({
