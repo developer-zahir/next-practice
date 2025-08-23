@@ -17,6 +17,7 @@ import type { Product } from '@/lib/products'
 export default function ProductDetailPage() {
   const params = useParams()
   const [product, setProduct] = useState<Product | null>(null)
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -24,8 +25,18 @@ export default function ProductDetailPage() {
       try {
         const response = await fetch(`/api/products/${params.id}`)
         if (response.ok) {
-          const data = await response.json()
+          const data: Product = await response.json()
           setProduct(data)
+
+          // Fetch related products (same category)
+          const relatedRes = await fetch(`/api/products?category=${encodeURIComponent(data.category)}`)
+          if (relatedRes.ok) {
+            const relatedData: Product[] = await relatedRes.json()
+            const filteredRelated = relatedData
+              .filter((p) => p._id !== data._id)
+              .slice(0, 4)
+            setRelatedProducts(filteredRelated)
+          }
         }
       } catch (error) {
         console.error('Failed to fetch product:', error)
@@ -177,21 +188,31 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        <div className="mt-16">
-          <h2 className="text-2xl font-bold mb-8">You might also like</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Card key={i} className="group hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-4">
-                  <div className="bg-muted rounded-lg h-32 mb-4"></div>
-                  <h3 className="font-semibold mb-2">Related Product {i + 1}</h3>
-                  <p className="text-muted-foreground text-sm mb-2">Similar product description</p>
-                  <span className="font-bold text-primary">$99.99</span>
-                </CardContent>
-              </Card>
-            ))}
+        {/* Related Products Section */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold mb-8 text-center">Related Products</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {relatedProducts.map((prod) => (
+                <Card key={prod._id} className="group hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-4">
+                    <div className="relative w-full h-32 mb-4">
+                      <Image
+                        src={prod.image}
+                        alt={prod.name}
+                        fill
+                        className="object-cover rounded-lg"
+                      />
+                    </div>
+                    <h3 className="font-semibold mb-2">{prod.name}</h3>
+                    <p className="text-muted-foreground text-sm mb-2 line-clamp-2">{prod.description}</p>
+                    <span className="font-bold text-primary">${prod.price}</span>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </main>
       <Footer />
     </div>
