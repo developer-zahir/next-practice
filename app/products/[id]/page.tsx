@@ -32,11 +32,11 @@ export default function ProductDetailPage() {
           const relatedRes = await fetch(`/api/products?category=${encodeURIComponent(data.category)}`);
           if (relatedRes.ok) {
             const relatedData: Product[] = await relatedRes.json();
-            console.log("Related products fetched:", relatedData);
+            console.log("all Related products fetched:", relatedData);
 
             const filteredRelated = relatedData.filter((p) => p._id.toString() !== product?._id.toString()).slice(0, 4);
             setRelatedProducts(filteredRelated);
-            console.log("Related products fetched:", filteredRelated);
+            console.log("filterd Related products fetched:", setRelatedProducts);
           }
         }
       } catch (err) {
