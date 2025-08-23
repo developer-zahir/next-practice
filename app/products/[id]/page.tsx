@@ -8,10 +8,10 @@ import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Star, Heart, Share2, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Star, Heart, Share2, ShoppingCart, ArrowRight } from "lucide-react";
 import type { Product } from "@/lib/products";
 
 export default function ProductDetailPage() {
