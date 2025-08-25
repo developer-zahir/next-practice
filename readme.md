@@ -79,7 +79,7 @@ A modern e-commerce product listing and detail page built with **Next.js 13**, f
 <!-- end list -->
 
 ```bash
-git clone https://github.com/yourusername/nextjs-product-listing.git
+git clone https://github.com/developer-zahir/next-practice.git
 cd nextjs-product-listing
 ```
 
